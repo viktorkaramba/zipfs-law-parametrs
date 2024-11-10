@@ -1,48 +1,10 @@
-import re
-from collections import Counter
-
 import pandas as pd
 import numpy as np
 import streamlit as st
-from scipy.optimize import curve_fit
 from streamlit_echarts import st_echarts
 
-
-def preprocess_text(text: str) -> str:
-    # Видаляємо спеціальні символи та переводимо текст у нижній регістр
-    text = re.sub(r'\W+', ' ', text)
-    return text.lower()
-
-
-def zipf_law_analysis(text: str) -> tuple[np.ndarray[int], np.ndarray[int], list[str]]:
-    # Попередня обробка тексту
-    processed_text = preprocess_text(text)
-
-    # Розбиваємо текст на слова
-    words = processed_text.split()
-
-    # Рахуємо частоти кожного слова
-    word_counts = Counter(words)
-
-    # Сортуємо слова за частотою у порядку спадання
-    sorted_word_counts = word_counts.most_common()
-
-    # Витягуємо ранги і частоти
-    ranks = np.arange(1, len(sorted_word_counts) + 1)
-    frequencies = np.array([count for _, count in sorted_word_counts])
-
-    return ranks, frequencies, [word for word, _ in sorted_word_counts]
-
-
-def zipf_fit(ranks: np.ndarray[int], frequencies: np.ndarray[int]) -> float:
-    # Функція для апроксимації закону Ципфа
-    def zipf_func(rank: int, a: int) -> float:
-        return a / rank
-
-    # Апроксимація параметра 'a'
-    params, _ = curve_fit(zipf_func, ranks, frequencies)
-    return params[0]
-
+from utility.analysis import zipf_law_analysis
+from utility.fit import zipf_fit
 
 # Інтерфейс Streamlit
 st.title("Параметри закону Ципфа")
