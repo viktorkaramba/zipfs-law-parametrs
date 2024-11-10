@@ -1,19 +1,20 @@
 import re
-import streamlit as st
 from collections import Counter
+
+import pandas as pd
 import numpy as np
+import streamlit as st
 from scipy.optimize import curve_fit
 from streamlit_echarts import st_echarts
-import pandas as pd
 
 
-def preprocess_text(text):
+def preprocess_text(text: str) -> str:
     # Видаляємо спеціальні символи та переводимо текст у нижній регістр
     text = re.sub(r'\W+', ' ', text)
     return text.lower()
 
 
-def zipf_law_analysis(text):
+def zipf_law_analysis(text: str) -> tuple[np.ndarray[int], np.ndarray[int], list[str]]:
     # Попередня обробка тексту
     processed_text = preprocess_text(text)
 
@@ -33,9 +34,9 @@ def zipf_law_analysis(text):
     return ranks, frequencies, [word for word, _ in sorted_word_counts]
 
 
-def zipf_fit(ranks, frequencies):
+def zipf_fit(ranks: np.ndarray[int], frequencies: np.ndarray[int]) -> float:
     # Функція для апроксимації закону Ципфа
-    def zipf_func(rank, a):
+    def zipf_func(rank: int, a: int) -> float:
         return a / rank
 
     # Апроксимація параметра 'a'
