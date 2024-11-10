@@ -1,25 +1,23 @@
-from collections import Counter
-
 import numpy as np
+import pandas as pd
+from scipy.optimize import curve_fit
 
-from utility.text_processing import preprocess_text
+
+def rank_words(words: list[str]) -> pd.DataFrame:
+    s = pd.Series(words)
+
+    df = s.value_counts().reset_index()
+    df.columns = ["word", "frequency"]
+
+    df["rank"] = df["frequency"].rank(method="dense", ascending=False)
+    return df
 
 
-def zipf_law_analysis(text: str) -> tuple[np.ndarray[int], np.ndarray[int], list[str]]:
-    # Попередня обробка тексту
-    processed_text = preprocess_text(text)
+def zipf_fit(ranks: np.ndarray[int], frequencies: np.ndarray[int]) -> float:
+    # Функція для апроксимації закону Ципфа
+    def zipf_func(rank: int, a: int) -> float:
+        return a / rank
 
-    # Розбиваємо текст на слова
-    words = processed_text.split()
-
-    # Рахуємо частоти кожного слова
-    word_counts = Counter(words)
-
-    # Сортуємо слова за частотою у порядку спадання
-    sorted_word_counts = word_counts.most_common()
-
-    # Витягуємо ранги і частоти
-    ranks = np.arange(1, len(sorted_word_counts) + 1)
-    frequencies = np.array([count for _, count in sorted_word_counts])
-
-    return ranks, frequencies, [word for word, _ in sorted_word_counts]
+    # Апроксимація параметра 'a'
+    params, _ = curve_fit(zipf_func, ranks, frequencies)
+    return params[0]

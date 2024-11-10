@@ -3,8 +3,8 @@ import numpy as np
 import streamlit as st
 from streamlit_echarts import st_echarts
 
-from utility.analysis import zipf_law_analysis
-from utility.fit import zipf_fit
+from utility.analysis import rank_words, zipf_fit
+from utility.processing import split_text
 
 # Інтерфейс Streamlit
 st.title("Параметри закону Ципфа")
@@ -15,7 +15,9 @@ text = st.text_area("Введіть текст для отримання пар�
 
 # Виконуємо аналіз
 if st.button("Запустити"):
-    ranks, frequencies, words = zipf_law_analysis(text)
+    words = split_text(text)
+    df = rank_words(words)
+    words, ranks, frequencies = list(df["word"]), df["rank"], df["frequency"],
     a = zipf_fit(ranks, frequencies)
 
     # Підготовка даних для графіка
