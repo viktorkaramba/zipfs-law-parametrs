@@ -1,6 +1,8 @@
+import math
+
 import numpy as np
 import pandas as pd
-from scipy.optimize import curve_fit
+from scipy.stats import linregress
 
 
 def rank_words(words: list[str]) -> pd.DataFrame:
@@ -13,11 +15,14 @@ def rank_words(words: list[str]) -> pd.DataFrame:
     return df
 
 
-def zipf_fit(ranks: np.ndarray[int], frequencies: np.ndarray[int]) -> float:
-    # Функція для апроксимації закону Ципфа
-    def zipf_func(rank: int, a: int) -> float:
-        return a / rank
+def fit_zipf(ranks: np.ndarray[int], frequencies: np.ndarray[int]) -> tuple[float, float]:
+    """Fit non-normalized Zipf distribution function parameters"""
+    # frequency = C / rank ^ s
+    # ln(frequency) = k * ln(rank) + b, where k = -s, b = ln(C)
 
-    # Апроксимація параметра 'a'
-    params, _ = curve_fit(zipf_func, ranks, frequencies)
-    return params[0]
+    k, b, _, _, _ = linregress(np.log(ranks), np.log(frequencies))
+
+    s = -float(k)
+    c = math.exp(b)
+
+    return s, c
