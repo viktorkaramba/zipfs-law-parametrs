@@ -35,14 +35,17 @@ def build_zipf_chart(ranks: np.ndarray[float], frequencies: np.ndarray[float],
     fig.add_trace(go.Scatter(
         x=np.log(ranks),
         y=np.log(fitted_frequencies),
+        customdata=fitted_frequencies,
         mode="lines",
-        name="Частота (модельна)"
+        name="Частота (модельна)",
+        hoverinfo="text",
+        hovertext=[f"({int(r)}, {f:.2f})" for r, f in zip(ranks, fitted_frequencies)]
     ))
 
     fig.update_layout(
         title="Log-Log графік закону Ципфа",
-        xaxis={"title": "ln(Ранг)", "tickvals": np.log(ranks), "ticktext": [f"ln({r})" for r in ranks]},
-        yaxis={"title": "ln(Частота)", "tickvals": np.log(frequencies), "ticktext": [f"ln({f})" for f in frequencies]},
+        xaxis={"title": "ln(Ранг)", "tickvals": np.log(ranks), "ticktext": ranks},
+        yaxis={"title": "ln(Частота)", "tickvals": np.log(frequencies), "ticktext": frequencies},
         showlegend=True
     )
 
